@@ -5,7 +5,7 @@ from timeit import default_timer as timer
 import os
 
 # Load a model
-model = YOLO('./runs/classify/train/weights/best.pt')
+model = YOLO('./yolov8n-cls.pt')
 
 
 results = model.predict(
