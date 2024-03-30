@@ -1,7 +1,6 @@
 
 import argparse
 
-# import YOLO model
 from myYOLO import MyYOLO
 
 def main(train_name):
@@ -11,10 +10,11 @@ def main(train_name):
     # Train the model
     model.train(
         name=train_name,  # model name
-        data=f'./data/processed/yolo_{train_name}/',
+        data=f'./data/processed/{train_name}/',
         batch=256,
         epochs=100,
         augment=True,
+        optimizer='AdamW',
     )
 
 if __name__ == '__main__':
