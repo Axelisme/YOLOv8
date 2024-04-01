@@ -20,3 +20,7 @@ class MyYOLO(Model):
             },
         }
 
+    def reset(self):
+        """Set model from checkpoint."""
+        self.__init__(model='yolov8n-cls.pt', task=self.task)
+

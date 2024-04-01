@@ -26,7 +26,7 @@ args = parser.parse_args()
 # load images
 conflict_count = 0
 existed_images = set()
-images = []
+split_images = []
 for raw_dataset in args.raw_datasets:
     if not os.path.isdir(raw_dataset):
         print(f"Ignore {raw_dataset}")
@@ -36,7 +36,7 @@ for raw_dataset in args.raw_datasets:
             for image in os.listdir(os.path.join(raw_dataset, label)):
                 if image.endswith(args.postfix):
                     if image not in existed_images:
-                        images.append(os.path.join(raw_dataset, label, image))
+                        split_images.append(os.path.join(raw_dataset, label, image))
                         existed_images.add(image)
                     else:
                         conflict_count += 1
@@ -48,7 +48,7 @@ print(f"Conflict count: {conflict_count}")
 
 # sperate images
 label_images = {l: [] for l in labels}
-for image in images:
+for image in split_images:
     label = dir2label[image.split("/")[-2]]
     label_images[label].append(image)
 
@@ -114,8 +114,8 @@ from tqdm.auto import tqdm
 # preprocess and save images
 parallel = Parallel(n_jobs=-1, return_as="generator")
 delayed_funcs = []
-for split, images in [("train", train_images), ("val", val_images)]:
-    for label, images in label_images.items():
+for split, split_images in [("train", train_images), ("val", val_images)]:
+    for label, images in split_images.items():
         os.makedirs(os.path.join(args.output_dir, split, label), exist_ok=True)
         for image in images:
             name = image.split("/")[-1]

@@ -5,12 +5,9 @@ from myYOLO import MyYOLO
 
 
 space = {
-    "lr0": (1e-5, 1e-1),
-    "lrf": (0.01, 1.0),
-    "momentum": (0.6, 0.98),
-    "weight_decay": (0.0, 0.001),
-    "warmup_epochs": (0.0, 5.0),
-    "warmup_momentum": (0.0, 0.95),
+    "hsv_h": (0.001, 0.2),
+    "hsv_s": (0.4, 0.9),
+    "hsv_v": (0.01, 0.5),
 }
 
 
@@ -19,16 +16,24 @@ def main(train_name):
     model = MyYOLO('yolov8n-cls.pt', task='classify')
 
     model.tune(
-        iterations=100,
-        space=space,
+        iterations = 30,
+        space      = space,
 
         # train arguments
-        data=f'/home/axel_chiu/Workspace/YOLOv8/data/processed/{train_name}',
-        epochs=10,
-        optimizer='AdamW',
-        augment=True,
-        save=False,
-        val=False,
+        data   = f'/home/axel_chiu/Workspace/YOLOv8/data/processed/{train_name}',
+        batch  = 256,
+        epochs = 10,
+
+        augment          = True,
+        optimizer        = 'AdamW',
+        lr0              = 0.00549,
+        lrf              = 0.013,
+        momentum         = 0.693,
+        weight_decay     = 0.0005,
+        warmup_epochs    = 2.0,
+        warmup_momentum  = 0.782,
+
+        save = False,
     )
 
 
