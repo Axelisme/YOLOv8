@@ -1,5 +1,9 @@
 fastapi
+uvicorn
+opencv-python
 matplotlib
+ultralytics
+evaluate
 numpy
 torch
 torchvision
