@@ -43,10 +43,6 @@ class PredictProcess:
     def video_fn(self):
         camera = cv2.VideoCapture(SOURCE_URL, cv2.CAP_FFMPEG)
 
-        # size (224, 224)
-        camera.set(cv2.CAP_PROP_FRAME_WIDTH,  224)
-        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 224)
-
         while self.running.is_set():
             self.working.wait()
 
@@ -102,7 +98,6 @@ class PredictProcess:
             # 控制更新速率
             time.sleep(max(0, UPDATE_PERIOD - (time.time() - start_t)))
 
-
     def update_fn(self):
         while self.running.is_set():
             if time.time() - self.last_access > WAIT_BEFORE_IDLE:
@@ -122,7 +117,6 @@ class PredictProcess:
             self.last_img = (t, proc_img)
 
             time.sleep(max(0, UPDATE_PERIOD - (time.time() - start_t)))
-
 
     def get_image(self):
         while self.running.is_set():

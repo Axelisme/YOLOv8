@@ -29,15 +29,16 @@ def transform_image(ori_image: np.ndarray) -> np.ndarray:
     prob = result.probs.top1conf.item()
 
     # draw result
+    ori_image = cv2.resize(ori_image, (640, 480), interpolation=cv2.INTER_NEAREST)
     cv2.putText(
         ori_image,
         f"{pred}, Probability: {prob:.2f}",
         # f"Time: {time.time():.2f}",
-        (100, 100),
+        (25, 50),
         cv2.FONT_HERSHEY_SIMPLEX,
-        4,
-        (0, 255, 0),
-        2,
+        1,
+        (0, 0, 255),
+        3,
         cv2.LINE_AA
     )
 
