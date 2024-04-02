@@ -22,6 +22,9 @@ def main(train_name):
         weight_decay     = 0.0005,
         warmup_epochs    = 2.0,
         warmup_momentum  = 0.782,
+        hsv_h            = 0.01276,
+        hsv_s            = 0.65114,
+        hsv_v            = 0.39083,
     )
 
 if __name__ == '__main__':

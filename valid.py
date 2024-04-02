@@ -11,9 +11,8 @@ def main(train_name, valid_name):
     metrics = model.val(
         name=f"val_{train_name}_on_{valid_name}",  # model name
         data=f'./data/processed/{valid_name}/',
-        split='train'
+        split='val'
     )
-    print(metrics)
     print(metrics.top1)
     print(metrics.topk)
     print(metrics.f1)
