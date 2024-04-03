@@ -37,10 +37,14 @@ class PredictProcess:
         self.video_thread.join()
         self.proc_thread.join()
 
+    def get_camera(self):
+        camera = cv2.VideoCapture(SOURCE_URL, cv2.CAP_FFMPEG)
+        camera.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        return camera
+
     def video_fn(self):
         retry_count = 0
-        camera = cv2.VideoCapture(SOURCE_URL, cv2.CAP_FFMPEG)
-        camera.set(cv2.CAP_PROP_BUFFERSIZE, 1) # 減少緩衝區大小
+        camera = self.get_camera()
 
         while self.running.is_set():
             self.working.wait()
@@ -53,13 +57,15 @@ class PredictProcess:
                 if retry_count >= RETRY_COUNT:
                     print('Failed to connect to camera, exiting...')
                     break
-                time.sleep(1) # 等待1秒
+                camera.release()
+                camera = self.get_camera()
                 continue
             retry_count = 0 # 成功讀取，重試次數歸零
 
             # 更新原始圖像
             self.raw_buffer = (time.time(), frame)
 
+        camera.release()
         self.running.clear()
 
     def proc_fn(self):
@@ -68,6 +74,7 @@ class PredictProcess:
         while self.running.is_set():
             if time.time() - self.last_access > WAIT_BEFORE_IDLE:
                 self.working.clear()
+                print('No client connected for a while, stop processing...', end='\r')
             self.working.wait()
 
             # 如果有新的原始圖像，則處理
