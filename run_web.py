@@ -3,30 +3,33 @@ import signal
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from webApp.process_img import PredictProcess
 
-video_process = PredictProcess()
-
-def signal_handler(sig, _):
-    global video_process
-    print(f"Received signal {sig}, stopping video process")
-    video_process.stop()
-    exit(0)
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
-
 
 if __name__ == "__main__":
+    video_process = PredictProcess()
+
+    def signal_handler(sig, _):
+        global video_process
+        print(f"Received signal {sig}, stopping video process")
+        video_process.stop()
+        exit(0)
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+
     app = FastAPI()
 
+    # template folder
+    templates = Jinja2Templates(directory="webApp/templates")
+
     @app.get("/", response_class=HTMLResponse)
-    async def index():
-        with open("webApp/templates/index.html", "r") as f:
-            html = f.read()
-        return HTMLResponse(content=html, status_code=200)
+    async def homepage(request: Request):
+        return templates.TemplateResponse("index.html", {"request": request})
 
     @app.get("/video_feed", response_class=StreamingResponse)
     async def video_feed():

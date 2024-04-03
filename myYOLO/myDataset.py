@@ -5,13 +5,14 @@ import torchvision.transforms.v2 as T
 from PIL import Image
 
 
+IMAGE_SIZE = 224
+
 def get_aug_transform(aug, args):
-    assert args.imgsz == 224, 'Image size must be 224 for this dataset'
 
     transform_fns = [
         T.ToImage(),
         T.ToDtype(torch.float32, scale=True),
-        T.Resize((args.imgsz, args.imgsz), interpolation=Image.NEAREST),
+        T.Resize((IMAGE_SIZE, IMAGE_SIZE), interpolation=Image.NEAREST),
     ]
 
     if aug:
