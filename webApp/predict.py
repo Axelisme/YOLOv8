@@ -1,7 +1,9 @@
 
-import numpy as np
-import cv2
+from typing import Dict, Any
 from argparse import Namespace
+
+import cv2
+import numpy as np
 
 from myYOLO import MyYOLO
 from myYOLO.myDataset import get_aug_transform
@@ -13,7 +15,7 @@ IMAGE_SIZE = 224
 model = MyYOLO(model_path)
 aug_fn = get_aug_transform(False, Namespace())
 
-def transform_image(ori_image: np.ndarray) -> np.ndarray:
+def transform_image(ori_image: np.ndarray) -> Dict[str, Any]:
     global model, aug_fn
 
     # preprocess
@@ -32,24 +34,12 @@ def transform_image(ori_image: np.ndarray) -> np.ndarray:
         verbose=False,
         imgsz=IMAGE_SIZE
     )[0]
-    pred_id = result.probs.top1
-    pred = model.names[pred_id]
-    prob = result.probs.top1conf.item()
 
-    # draw result
-    ori_image = cv2.resize(ori_image, (640, 480), interpolation=cv2.INTER_NEAREST)
-    cv2.putText(
-        ori_image,
-        f"{pred}, Probability: {prob:.2f}",
-        (25, 50),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        (0, 0, 255),
-        3,
-        cv2.LINE_AA
-    )
-
-    return ori_image
+    # make result and return
+    return {
+        "prediction": model.names[result.probs.top1],
+        "probability": result.probs.top1conf.item()
+    }
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 
+import json
 import time
 from threading import Thread, Event
 import asyncio
@@ -17,7 +18,7 @@ class PredictProcess:
         self.running = Event()
         self.working = Event()
         self.raw_buffer = None
-        self.last_buffer = None
+        self.last_result = None
         self.last_access = 0
         self.video_thread  = Thread(target=self.video_fn)
         self.proc_thread  = Thread(target=self.proc_fn)
@@ -83,29 +84,21 @@ class PredictProcess:
                 self.raw_buffer = None
 
                 # 處理圖像
-                proc_img = transform_image(raw_img)
-
-                # 編碼圖像
-                success, proc_img = cv2.imencode('.jpg', proc_img)
-                if not success:
-                    print('Failed to encode image')
-                    continue
+                result = transform_image(raw_img)
+                result['timestamp'] = t
 
                 # 更新最新圖像
-                self.last_buffer = (t, proc_img)
+                self.last_result = result
             else:
                 time.sleep(0.1)
 
-    async def get_image(self):
+    async def get_result(self):
         while self.running.is_set():
             self.last_access = time.time()
             self.working.set()
-            if self.last_buffer is not None:
-                t, img = self.last_buffer
+            if self.last_result is not None:
+                timestamp = self.last_result['timestamp']
+                print(f'Time delay: {time.time() - timestamp:.2f}s', end='\r')
 
-                print(f'Time delay: {time.time() - t:.2f}s', end='\r')
-
-                # 返回處理後的圖像
-                yield b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + img.tobytes() + b'\r\n'
+                yield json.dumps(self.last_result) + '\n'
             await asyncio.sleep(UPDATE_PERIOD)
-        yield b''

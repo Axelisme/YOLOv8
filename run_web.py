@@ -32,13 +32,18 @@ if __name__ == "__main__":
     async def homepage(request: Request):
         return templates.TemplateResponse("index.html", {"request": request})
 
-    # video feed
-    @app.get("/video_feed", response_class=StreamingResponse)
+    # video stream
+    @app.get("/video_feed")
     async def video_feed():
-        return StreamingResponse(video_process.get_image(), media_type='multipart/x-mixed-replace; boundary=frame')
+        return StreamingResponse(video_process.get_video(), media_type='multipart/x-mixed-replace; boundary=frame')
+
+    # get result
+    @app.get("/get_result")
+    async def get_result():
+        return StreamingResponse(video_process.get_result(), media_type='application/x-ndjson')
 
     # icon
-    @app.get("/favicon.ico", response_class=FileResponse)
+    @app.get("/favicon.ico")
     async def favicon():
         return FileResponse("webApp/images/icon-nobg.png")
 
