@@ -16,23 +16,19 @@
         .container {
             width: 100%;
             max-width: 800px;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             position: relative;
         }
 
         #prediction-img {
             width: 100%;
             height: auto;
-            max-height: 100%;
+            max-height: 100vh;
             object-fit: contain;
         }
 
         .prediction-overlay {
             position: absolute;
-            top: 10px;
+            top: 0;
             left: 10px;
             font-size: 24px;
             font-weight: bold;
@@ -42,15 +38,56 @@
             border-radius: 5px;
             z-index: 2;
         }
+
+
+        .button-container {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: center;
+            z-index: 3;
+        }
+
+        .button-container button {
+            margin: 7px;
+            font-size: 24px;
+            padding: 7px 15px;
+            border-radius: 7px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            z-index: 999;
+            display: none;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <img id="prediction-img" src='http://norky:nkjs24672132@60.251.33.67:8010/video1s2.mjpg'
-            alt="Waiting predicted Image...">
+        <img id="prediction-img" src="/video_feed" alt="Waiting predicted Image...">
         <div id="prediction" class="prediction-overlay">Prediction: N/A</div>
+        <div class="button-container">
+            <button id="btn1">B1</button>
+            <button id="btn2">B2</button>
+            <button id="btn3">B3</button>
+            <button id="btn4">B4</button>
+            <button id="btn5">B5</button>
+            <button id="btn6">B6</button>
+        </div>
     </div>
+
+    <div class="notification" id="notification">Feedback Sent</div>
 
     <script>
         const predictionImg = document.getElementById('prediction-img');
@@ -70,6 +107,34 @@
         }
 
         fetchPrediction();
+
+        const buttons = document.querySelectorAll('.button-container button');
+        const notificationElement = document.getElementById('notification');
+        buttons.forEach((button, index) => {
+            button.addEventListener('click', async () => {
+                const buttonName = `B${index + 1}`;
+
+                try {
+                    const response = await fetch("/send_feedback", {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            feedback: buttonName
+                        }),
+                    });
+
+                    const result = await response.json();
+                    console.log('Feedback response:', result.message);
+
+                    // 顯示通知
+                    notificationElement.style.display = 'block';
+                    setTimeout(() => {
+                        notificationElement.style.display = 'none';
+                    }, 500);
+                } catch (error) {
+                    console.error('Error sending feedback:', error);
+                }
+            });
+        });
     </script>
 </body>
 
