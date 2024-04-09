@@ -1,11 +1,10 @@
 import os
 import time
-import base64
 import signal
+import logging
 
 import cv2
 import uvicorn
-import numpy as np
 from fastapi import FastAPI
 from fastapi.requests import Request
 from fastapi.responses import (
@@ -18,13 +17,22 @@ from fastapi.templating import Jinja2Templates
 
 from webApp.process_img import PredictProcess
 
+# 設置日誌
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger("webApp")
 
 if __name__ == "__main__":
+
+    # 創建視頻處理線程
     video_process = PredictProcess()
 
+    # 設置信號處理
     def signal_handler(sig, _):
         global video_process
-        print(f"Received signal {sig}, stopping video process")
+        logger.info(f"Received signal {sig}, stopping video process")
         video_process.stop()
         exit(0)
 
@@ -80,13 +88,13 @@ if __name__ == "__main__":
                 if not cv2.imwrite(img_path, frame):
                     raise ValueError("Error in saving feedback image!")
 
-                print(f"Saved feedback to {img_path}!")
+                logger.info(f"Saved feedback to {img_path}!")
 
                 return JSONResponse(content={"message": "Feedback received!"})
             else:
                 return JSONResponse(content={"message": "No frame available!"})
         except Exception as e:
-            print(f"Error in send_feedback: {e}")
+            logger.error(f"Error in send_feedback: {e}")
             return JSONResponse(content={"message": "Error in processing feedback!"})
 
     video_process.start()

@@ -1,5 +1,6 @@
 import json
 import time
+import logging
 from threading import Thread, Event
 import asyncio
 
@@ -10,6 +11,14 @@ SOURCE_URL = "http://norky:nkjs24672132@60.251.33.67:8010/video1s2.mjpg"
 WAIT_BEFORE_IDLE = 1
 UPDATE_PERIOD = 0.5
 RETRY_COUNT = 100
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s",
+)
+
+logger = logging.getLogger("img_process")
 
 
 class PredictProcess:
@@ -27,13 +36,13 @@ class PredictProcess:
         return self.last_img
 
     def start(self):
-        print("Starting video process...")
+        logger.info("Starting video process...")
         self.running.set()
         self.video_thread.start()
         self.proc_thread.start()
 
     def stop(self):
-        print("Stopping video process...")
+        logger.info("Stopping video process...")
         self.working.set()
         self.running.clear()
 
@@ -57,9 +66,11 @@ class PredictProcess:
             success, frame = camera.read()
             if not success:
                 retry_count += 1  # 重試次數
-                print(f"Camera is unavailable! Retry: {retry_count}/{RETRY_COUNT}")
+                logger.warning(
+                    f"Camera is unavailable! Retry: {retry_count}/{RETRY_COUNT}"
+                )
                 if retry_count >= RETRY_COUNT:
-                    print("Failed to connect to camera, exiting...")
+                    logger.error("Failed to connect to camera, exiting...")
                     break
                 camera.release()
                 camera = self.get_camera()
