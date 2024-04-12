@@ -14,7 +14,7 @@ class MyLoss(FocalLoss):
 
 
 class MyModel(ClassificationModel):
-    pass
-    # def init_criterion(self):
-    #     """Initialize the loss criterion for the ClassificationModel."""
-    #     return MyLoss()
+    def init_criterion(self):
+        """Initialize the loss criterion for the ClassificationModel."""
+        return super().init_criterion()
+        # return MyLoss()

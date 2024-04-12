@@ -1,10 +1,11 @@
-
-import cv2
 import os
-import random
-import numpy as np
 
 import joblib
+
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 def get_blur(path):
     img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
@@ -16,6 +17,7 @@ def get_blur(path):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     fm = cv2.Laplacian(gray, cv2.CV_64F).var()
     return fm
+
 
 parallel = joblib.Parallel(n_jobs=-1)
 file_list = []
@@ -38,14 +40,20 @@ for p, fm in zip(file_list, results):
         blur_list.append((p, fm))
 
 
-
 for p, fm in blur_list:
     img = cv2.imread(p, cv2.IMREAD_UNCHANGED)
     if img is None:
         continue
     img = cv2.resize(img, (960, 480))
-    cv2.putText(img, "Blur: {:.2f}".format(fm), (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 3)
+    cv2.putText(
+        img,
+        "Blur: {:.2f}".format(fm),
+        (10, 30),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.8,
+        (0, 0, 255),
+        3,
+    )
     cv2.imshow("img", img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -55,8 +63,6 @@ blur_avg = np.mean(blurs)
 blur_std = np.std(blurs)
 print("Blur avg: {:.2f}".format(blur_avg))
 print("Blur std: {:.2f}".format(blur_std))
-
-import matplotlib.pyplot as plt
 
 plt.hist(blurs, bins=100)
 plt.show()

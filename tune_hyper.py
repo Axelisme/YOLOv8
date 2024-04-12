@@ -1,4 +1,3 @@
-
 import argparse
 
 from myYOLO import MyYOLO
@@ -11,35 +10,38 @@ space = {
 }
 
 
-def main(train_name):
+def main(tune_name):
     # Load a model
-    model = MyYOLO('yolov8n-cls.pt', task='classify')
+    model = MyYOLO("yolov8n-cls.pt", task="classify")
 
     model.tune(
-        iterations = 30,
-        space      = space,
-
+        iterations=30,
+        space=space,
         # train arguments
-        data   = f'/home/axel_chiu/Workspace/YOLOv8/data/processed/{train_name}',
-        batch  = 256,
-        epochs = 10,
-
-        augment          = True,
-        optimizer        = 'AdamW',
-        lr0              = 0.00549,
-        lrf              = 0.013,
-        momentum         = 0.693,
-        weight_decay     = 0.0005,
-        warmup_epochs    = 2.0,
-        warmup_momentum  = 0.782,
-
-        save = False,
+        data=f"/home/axel_chiu/Workspace/YOLOv8/data/processed/{tune_name}",
+        batch=256,
+        epochs=10,
+        augment=True,
+        optimizer="AdamW",
+        lr0=0.00549,
+        lrf=0.013,
+        momentum=0.693,
+        weight_decay=0.0005,
+        warmup_epochs=2.0,
+        warmup_momentum=0.782,
+        save=False,
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--train_name', required=True, type=str, help='Name of the train dataset withou yolo_ prefix')
+    parser.add_argument(
+        "-n",
+        "--tune_name",
+        required=True,
+        type=str,
+        help="Name of the train dataset",
+    )
     args = parser.parse_args()
 
-    main(args.train_name)
+    main(args.tune_name)
