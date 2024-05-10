@@ -1,6 +1,11 @@
 import os
 import random
 import argparse
+from joblib import Parallel, delayed
+
+import numpy as np
+from PIL import Image
+from tqdm.auto import tqdm
 
 
 dir2label = {
@@ -47,7 +52,7 @@ for raw_dataset in args.raw_datasets:
 print(f"Conflict count: {conflict_count}")
 
 # sperate images
-label_images = {l: [] for l in labels}
+label_images = {label: [] for label in labels}
 for image in split_images:
     label = dir2label[image.split("/")[-2]]
     label_images[label].append(image)
@@ -59,14 +64,18 @@ for label in labels:
 # balance dataset
 if args.bal:
     label_nums = [len(label_images[label]) for label in labels]
-    min_num = int(1.5 * min(label_nums))
+    min_num = min(10 * min(label_nums), max(label_nums))
     for label in labels:
+        if len(label_images[label]) < min_num:
+            label_images[label] = label_images[label] * (
+                min_num // len(label_images[label]) + 1
+            )
         label_images[label] = label_images[label][:min_num]
 
 
 # split dataset
-train_images = {l: [] for l in labels}
-val_images = {l: [] for l in labels}
+train_images = {label: [] for label in labels}
+val_images = {label: [] for label in labels}
 for label in labels:
     num_eval = int(len(label_images[label]) * args.eval_ratio) + 1
     val_images[label] = label_images[label][:num_eval]
@@ -91,9 +100,6 @@ for label in labels:
 print()
 
 
-from PIL import Image
-import numpy as np
-
 def preprocess_image(src_path, dst_path):
     img = Image.open(src_path)
 
@@ -101,15 +107,12 @@ def preprocess_image(src_path, dst_path):
     img = img.resize((224, 224), Image.NEAREST).convert("RGB")
 
     img = np.array(img)
-    img[13:13+19,0:0+141,:] = [0,0,0]
-    img[193:193+24,150:150+62,:] = [0,0,0]
+    img[13 : 13 + 19, 0 : 0 + 141, :] = [0, 0, 0]
+    img[193 : 193 + 24, 150 : 150 + 62, :] = [0, 0, 0]
     img = Image.fromarray(img)
 
     img.save(dst_path)
 
-
-from joblib import Parallel, delayed
-from tqdm.auto import tqdm
 
 # preprocess and save images
 parallel = Parallel(n_jobs=-1, return_as="generator")
@@ -117,9 +120,13 @@ delayed_funcs = []
 for split, split_images in [("train", train_images), ("val", val_images)]:
     for label, images in split_images.items():
         os.makedirs(os.path.join(args.output_dir, split, label), exist_ok=True)
-        for image in images:
+        for i, image in enumerate(images):
             name = image.split("/")[-1]
-            delayed_funcs.append(delayed(preprocess_image)(image, os.path.join(args.output_dir, split, label, name)))
+            delayed_funcs.append(
+                delayed(preprocess_image)(
+                    image, os.path.join(args.output_dir, split, label, f"{i}_{name}")
+                )
+            )
 pbar = tqdm(total=len(delayed_funcs), desc="Processing")
 for _ in parallel(delayed_funcs):
     pbar.update()

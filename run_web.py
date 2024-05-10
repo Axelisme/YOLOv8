@@ -25,7 +25,6 @@ logging.basicConfig(
 logger = logging.getLogger("webApp")
 
 if __name__ == "__main__":
-
     # 創建視頻處理線程
     video_process = PredictProcess()
 
