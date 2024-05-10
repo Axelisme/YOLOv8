@@ -78,6 +78,7 @@ if __name__ == "__main__":
 
             if t_img := video_process.get_last_frame():
                 _, frame = t_img
+                frame = cv2.resize(frame,(640,480))
 
                 # 保存圖像
                 label_dir = os.path.join("data/feedback", feedback)

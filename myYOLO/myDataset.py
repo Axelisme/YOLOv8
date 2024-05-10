@@ -5,7 +5,7 @@ import torchvision.transforms.v2 as T
 from PIL import Image
 
 
-IMAGE_SIZE = 224
+IMAGE_SIZE = 480
 
 def get_aug_transform(aug, args):
 

@@ -7,7 +7,8 @@ import asyncio
 import cv2
 
 
-SOURCE_URL = "http://norky:nkjs24672132@60.251.33.67:8010/video1s2.mjpg"
+#SOURCE_URL = "http://norky:nkjs24672132@60.251.33.67:8010/video1s2.mjpg"
+SOURCE_URL = "http://norky:nkjs24672132@192.168.19.10/video1s2.mjpg"
 WAIT_BEFORE_IDLE = 1
 UPDATE_PERIOD = 0.5
 RETRY_COUNT = 100

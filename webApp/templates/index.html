@@ -30,7 +30,7 @@
             position: absolute;
             top: 0;
             left: 10px;
-            font-size: 24px;
+            font-size: 48px;
             font-weight: bold;
             color: red;
             background-color: rgba(0, 0, 0, 0.5);
@@ -54,8 +54,8 @@
 
         .button-container button {
             margin: 7px;
-            font-size: 24px;
-            padding: 7px 15px;
+            font-size: 48px;
+            padding: 14px 30px;
             border-radius: 7px;
         }
 
@@ -102,7 +102,7 @@
                 if (done) break;
 
                 const result = JSON.parse(new TextDecoder().decode(value));
-                predictionElement.textContent = `Prediction: ${result.prediction} (${(result.probability * 100).toFixed(2)}%)`;
+                predictionElement.textContent = `AI : ${result.prediction} (${(result.probability * 100).toFixed(0)}%)`;
             }
         }
 
