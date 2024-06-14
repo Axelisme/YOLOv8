@@ -103,6 +103,7 @@
 
                 const result = JSON.parse(new TextDecoder().decode(value));
                 predictionElement.textContent = `AI : ${result.prediction} (${(result.probability * 100).toFixed(0)}%)`;
+                // predictionElement.textContent = `AI : ${result.prediction}, Or: ${result.second_pred}`;
             }
         }
 

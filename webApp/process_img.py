@@ -1,13 +1,12 @@
-import json
-import time
-import logging
-from threading import Thread, Event
 import asyncio
+import json
+import logging
+import time
+from threading import Event, Thread
 
 import cv2
 
-
-#SOURCE_URL = "http://norky:nkjs24672132@60.251.33.67:8010/video1s2.mjpg"
+# SOURCE_URL = "http://norky:nkjs24672132@60.251.33.67:8010/video1s2.mjpg"
 SOURCE_URL = "http://norky:nkjs24672132@192.168.19.10/video1s2.mjpg"
 WAIT_BEFORE_IDLE = 1
 UPDATE_PERIOD = 0.5
@@ -33,6 +32,8 @@ class PredictProcess:
         self.video_thread = Thread(target=self.video_fn)
         self.proc_thread = Thread(target=self.proc_fn)
 
+        self.delay_file = open("./webApp/delay.txt", "w")
+
     def get_last_frame(self):
         return self.last_img
 
@@ -44,8 +45,8 @@ class PredictProcess:
 
     def stop(self):
         logger.info("Stopping video process...")
-        self.working.set()
         self.running.clear()
+        self.working.set()
 
     def join(self):
         self.video_thread.join()
@@ -118,13 +119,23 @@ class PredictProcess:
                 )
             await asyncio.sleep(UPDATE_PERIOD)
 
+    def print_to_file(self, content):
+        self.delay_file.write(content)
+        self.delay_file.flush()
+        # move the cursor to the head of the file
+        self.delay_file.seek(0)
+
     async def get_result(self):
         while self.running.is_set():
             self.last_access = time.time()
             self.working.set()
             if result := self.last_result:
+                pred = result["prediction"]
+                prob = result["probability"]
                 timestamp = result["timestamp"]
-                print(f"Time delay: {time.time() - timestamp:.2f}s", end="\r")
+                self.print_to_file(
+                    f"Time delay: {time.time() - timestamp:.2f}s\nPrediction: {pred} ({100*prob:0.2f}%)\n"
+                )
 
                 yield json.dumps(result) + "\n"
             await asyncio.sleep(UPDATE_PERIOD)

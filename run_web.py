@@ -1,23 +1,25 @@
-import os
-import time
-import signal
 import logging
+import os
+import signal
+import time
 
+import numpy as np
 import cv2
 import uvicorn
 from fastapi import FastAPI
 from fastapi.requests import Request
 from fastapi.responses import (
-    HTMLResponse,
-    StreamingResponse,
     FileResponse,
+    HTMLResponse,
     JSONResponse,
+    StreamingResponse,
 )
 from fastapi.templating import Jinja2Templates
 
+from webApp.predict import reload_model
 from webApp.process_img import PredictProcess
 
-# 設置日誌
+# 設置日誌,寫入到文件
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s",
@@ -77,10 +79,11 @@ if __name__ == "__main__":
 
             if t_img := video_process.get_last_frame():
                 _, frame = t_img
-                frame = cv2.resize(frame,(640,480))
+                frame = cv2.resize(frame, (640, 480))
 
-                # 保存圖像
-                label_dir = os.path.join("data/feedback", feedback)
+                # 保存圖像，以5%的概率保存到測試集
+                test_set_ratio = 0.05
+                label_dir = os.path.join("data/feedback_testing", feedback) if np.random.rand() < test_set_ratio else os.path.join("data/feedback", feedback)
                 os.makedirs(label_dir, exist_ok=True)
                 img_path = os.path.join(
                     label_dir, f'{time.strftime("%Y%m%d%H%M%S")}.jpg'
@@ -96,6 +99,16 @@ if __name__ == "__main__":
         except Exception as e:
             logger.error(f"Error in send_feedback: {e}")
             return JSONResponse(content={"message": "Error in processing feedback!"})
+
+    # reload model
+    @app.get("/reload_model")
+    async def reload_model(path: str):
+        try:
+            reload_model(path)
+            return JSONResponse(content={"message": "Model reloaded successfully!"})
+        except Exception as e:
+            logger.error(f"Error in reload_model: {e}")
+            return JSONResponse(content={"message": "Error in reloading model!"})
 
     video_process.start()
 
