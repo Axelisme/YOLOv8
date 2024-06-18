@@ -9,6 +9,7 @@ space = {
     "hsv_v": (0.01, 0.5),
 }
 
+IMAGE_SIZE = 480
 
 def main(tune_name):
     # Load a model
@@ -19,7 +20,10 @@ def main(tune_name):
         space=space,
         # train arguments
         data=f"/home/axel_chiu/Workspace/YOLOv8/data/processed/{tune_name}",
-        batch=256,
+        imgsz=IMAGE_SIZE,
+        batch=80,
+        # imgsz=224,
+        # batch=256,
         epochs=10,
         augment=True,
         optimizer="AdamW",

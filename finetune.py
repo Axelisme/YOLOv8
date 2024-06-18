@@ -3,6 +3,7 @@ import argparse
 # import YOLO model
 from myYOLO import MyYOLO
 
+IMAGE_SIZE = 480
 
 def main(train_name, finetune_name):
     # Load a model
@@ -12,7 +13,10 @@ def main(train_name, finetune_name):
     model.train(
         name=f"{train_name}_tune_on_{finetune_name}_lls",  # model name
         data=f"./data/processed/{finetune_name}/",
-        batch=256,
+        imgsz=IMAGE_SIZE,
+        batch=80,
+        # imgsz=224,
+        # batch=256,
         epochs=10,
         augment=True,
         optimizer="AdamW",

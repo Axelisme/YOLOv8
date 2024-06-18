@@ -5,7 +5,7 @@ from timeit import default_timer as timer
 from matplotlib import pyplot as plt
 
 N = 1000
-
+IMAGE_SIZE = 480
 
 # preprocess the image
 def load_image(path):
@@ -15,11 +15,11 @@ def load_image(path):
 record = {"cuda": [], "cpu": []}
 for device, times in record.items():
     model = MyYOLO("./yolov8n-cls.pt")
-    model.predict(load_image("test_image.png"), imgsz=224, device=device)
+    model.predict(load_image("test_image.png"), imgsz=IMAGE_SIZE, device=device)
     start_time = timer()
     for i in range(N):
         print(f"Running on {device} device, image {i + 1}/{N}")
-        results = model.predict(load_image("test_image.png"), imgsz=224, device=device)
+        results = model.predict(load_image("test_image.png"), imgsz=480, device=device)
         times.append(timer() - start_time)
 
 

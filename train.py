@@ -2,6 +2,7 @@ import argparse
 
 from myYOLO import MyYOLO
 
+IMAGE_SIZE = 480
 
 def main(train_name):
     # Load a model
@@ -11,12 +12,16 @@ def main(train_name):
     model.train(
         name=train_name,  # model name
         data=f"./data/processed/{train_name}/",
-        batch=256,
-        epochs=15,
+        imgsz=IMAGE_SIZE,
+        batch=80,
+        # imgsz=224,
+        # batch=256,
+        epochs=20,
         augment=True,
         optimizer="AdamW",
         lr0=0.00549,
-        lrf=0.013,
+        lrf=0.25,
+        # lrf=0.013,
         momentum=0.693,
         weight_decay=0.0005,
         warmup_epochs=2.0,

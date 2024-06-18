@@ -9,7 +9,7 @@ from myYOLO.myDataset import get_aug_transform
 
 
 model_path = "./runs/classify/2023bal2/weights/best.pt"
-IMAGE_SIZE = 224
+IMAGE_SIZE = 480
 
 model = MyYOLO(model_path)
 aug_fn = get_aug_transform(False, Namespace())
@@ -24,8 +24,8 @@ def transform_image(ori_image: np.ndarray) -> Dict[str, Any]:
     )
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     # block date and time
-    image[13 : 13 + 19, 0 : 0 + 141, :] = [0, 0, 0]
-    image[193 : 193 + 24, 150 : 150 + 62, :] = [0, 0, 0]
+    # image[13 : 13 + 19, 0 : 0 + 141, :] = [0, 0, 0]
+    # image[193 : 193 + 24, 150 : 150 + 62, :] = [0, 0, 0]
     # augment
     image = aug_fn(image).unsqueeze(0)  # (1, 3, 224, 224)
 

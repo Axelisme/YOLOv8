@@ -1,5 +1,6 @@
 .vscode/
 data
+data/*
 runs/
 wandb/
 yolo*.pt
