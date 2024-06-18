@@ -3,4 +3,6 @@ data
 data/*
 runs/
 wandb/
-yolo*.pt
+*.pt
+*.pyc
+*.txt
